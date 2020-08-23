@@ -14,5 +14,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// ROUTES RESOURCE FOR USERS
-Route::apiResource('users', 'UserController');
+// ROUTE FOR LOGIN AND REGISTER
+Route::post('login', 'AuthController@login');
+Route::post('register', 'AuthController@register');
+
+Route::group(['middleware' => 'auth:api'], function () {
+
+    Route::get('user', 'UserController@user');
+    Route::get('users/info', 'UserController@updateInfo');
+    Route::get('users/password', 'UserController@updatePassword');
+
+    // ROUTES RESOURCE FOR USERS
+    Route::apiResource('users', 'UserController');
+    // ROUTES RESOURCE FOR ROLES
+    Route::apiResource('roles', 'RoleController');
+
+
+});
