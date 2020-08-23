@@ -101,6 +101,8 @@ class SupermarketController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $supermarket = Supermarket::find($id);
+        $supermarket->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

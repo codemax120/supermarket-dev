@@ -14,4 +14,9 @@ class Supermarket extends Model
         'supermarket_name', 'supermarket_logo', 'supermarket_status'
     ];
 
+    public function supermarketBranch()
+    {
+        return $this->belongsToMany(SupermarketBranch::class, 'supermarket_branch_bridge')->withTimestamps();
+    }
+
 }
