@@ -28,6 +28,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::apiResource('users', 'UserController');
     // ROUTES RESOURCE FOR ROLES
     Route::apiResource('roles', 'RoleController');
-
+    // ROUTES RESOURCE FOR SUPERMARKET
+    Route::apiResource('supermarkets', 'RoleController');
 
 });

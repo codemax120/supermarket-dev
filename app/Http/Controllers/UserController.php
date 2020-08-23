@@ -21,7 +21,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::paginate();
+        return User::with('role')->paginate();
     }
 
     /**
@@ -37,6 +37,7 @@ class UserController extends Controller
             'last_name' => $request->input('last_name'),
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
+            'role_id' => 1
         ]);
         return response($user, Response::HTTP_CREATED);
     }
@@ -49,7 +50,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return User::find($id);
+        return User::with('role')->find($id);
     }
 
     /**
