@@ -34,6 +34,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('supermarkets/logo-update', 'SupermarketController@logoUpdate');
     // ROUTES RESOURCE FOR SUPERMARKET-BRANCH
     Route::apiResource('supermarkets-branch', 'SupermarketBranchController');
-
+    // ROUTE RESOURCE FOR CATEGORIES
+    Route::apiResource('categories', 'CategoryController');
+    // ROUTE RESOURCE FOR PRODUCTS
+    
 
 });
