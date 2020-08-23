@@ -6,6 +6,7 @@ use App\Http\Requests\UpdateInfoRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\UserResource;
 use App\User;
 use http\Env\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::with('role')->paginate();
+        $users = User::paginate();
+        return UserResource::collection($users);
     }
 
     /**
@@ -39,7 +41,7 @@ class UserController extends Controller
             'password' => Hash::make($request->input('password')),
             'role_id' => 1
         ]);
-        return response($user, Response::HTTP_CREATED);
+        return response(new UserResource($user), Response::HTTP_CREATED);
     }
 
     /**
@@ -50,7 +52,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return User::with('role')->find($id);
+        $user = User::find($id);
+        return new UserResource($user);
     }
 
     /**
@@ -67,7 +70,7 @@ class UserController extends Controller
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
         ]);
-        return response($user, Response::HTTP_ACCEPTED);
+        return response(new UserResource($user), Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -84,7 +87,7 @@ class UserController extends Controller
 
     public function user()
     {
-        return Auth::user();
+        return new UserResource(Auth::user());
     }
 
     public function updateInfo(UpdateInfoRequest $request)
@@ -94,7 +97,7 @@ class UserController extends Controller
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
         ]);
-        return response($user, Response::HTTP_ACCEPTED);
+        return response(new UserResource($user), Response::HTTP_ACCEPTED);
     }
 
     public function updatePassword(UpdatePasswordRequest $request)
@@ -103,7 +106,7 @@ class UserController extends Controller
         $user->update([
             'password' => Hash::make($request->input('password'))
         ]);
-        return response($user, Response::HTTP_ACCEPTED);
+        return response(new UserResource($user), Response::HTTP_ACCEPTED);
     }
 
 }

@@ -51,7 +51,14 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
+            'visibility' => 'public',
+        ],
+
+        'logo' => [
+            'driver' => 'local',
+            'root' => public_path('assets/logos'),
+            'url' => env('APP_URL') . '/public/assets/logos',
             'visibility' => 'public',
         ],
 
