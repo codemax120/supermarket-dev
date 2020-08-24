@@ -40,6 +40,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::apiResource('products', 'ProductController');
     // ROUTE FOR UPDATE PRODUCT IMAGE
     Route::post('products/image-update', 'ProductController@imageProductUpdate');
+    // ROUTE RESOURCE FOR INVENTORY
+    Route::apiResource('inventories', 'InventoryController');
 
 
 });
