@@ -6,7 +6,7 @@ use App\Helpers\AppHelper;
 use App\Http\Requests\InventoryStoreRequest;
 use App\Http\Resources\InventoryResource;
 use App\Inventory;
-use http\Env\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;

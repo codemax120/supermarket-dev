@@ -9,7 +9,7 @@ use App\Http\Resources\SupermarketBranchResource;
 use App\SupermarketBranch;
 use App\SupermarketBranchBridge;
 use Carbon\Carbon;
-use http\Env\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;

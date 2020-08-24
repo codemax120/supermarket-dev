@@ -30,6 +30,11 @@ class UserController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
+     * @QA\Get(path="/users"
+     *     @QA\Response(response="200"
+     *         descripcion="User Collection"
+     *     )
+     * )
      */
     public function index(Request $request)
     {
