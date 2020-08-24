@@ -2,24 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
 use App\Http\Requests\InventoryStoreRequest;
 use App\Http\Resources\InventoryResource;
 use App\Inventory;
+use http\Env\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class InventoryController extends Controller
 {
+
+    public $appLog;
+
+    function __construct()
+    {
+        $this->appLog = new AppHelper();
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('action', 'users');
         $inventary = Inventory::orderBy('id', 'DESC')->paginate();
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha listado los inventarios', 'Informacion listada exitosamente',
+            $request->ip());
+
         return InventoryResource::collection($inventary);
     }
 
@@ -39,6 +54,12 @@ class InventoryController extends Controller
         $inventory->month = $this->monthOfYear(date('M'))['month'];
         $inventory->month_order = $this->monthOfYear(date('M'))['order'];
         $inventory->save();
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha listado registrado un nuevo inventario',
+            'Informacion registrada exitosamente',
+            $request->ip());
+
         return response(new InventoryResource($inventory), Response::HTTP_CREATED);
     }
 
@@ -48,10 +69,16 @@ class InventoryController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         Gate::authorize('action', 'users');
         $inventory = Inventory::find($id);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha listado la informacion del inventario',
+            'Informacion listada exitosamente',
+            $request->ip());
+
         return new InventoryResource($inventory);
     }
 
@@ -69,6 +96,12 @@ class InventoryController extends Controller
         $inventory->product_id = $request->input('product_id');
         $inventory->product_count = $request->input('product_count');
         $inventory->save();
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha actualizado la informacion del inventario',
+            'Informacion actualizada exitosamente',
+            $request->ip());
+
         return response(new InventoryResource($inventory), Response::HTTP_CREATED);
     }
 
@@ -78,10 +111,16 @@ class InventoryController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         Gate::authorize('action', 'users');
         Inventory::destroy($id);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha eliminado la informacion del inventario',
+            'Informacion elimnada exitosamente',
+            $request->ip());
+
         return response(null, Response::HTTP_NO_CONTENT);
     }
 

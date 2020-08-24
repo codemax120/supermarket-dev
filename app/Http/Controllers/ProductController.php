@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
 use App\Http\Requests\ProductStoreRequest;
 use App\Http\Requests\ProductUpdateImageRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Product;
+use http\Env\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -14,15 +17,27 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
 {
+    public $appLog;
+
+    function __construct()
+    {
+        $this->appLog = new AppHelper();
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('action', 'users');
         $categories = Product::paginate();
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha listado los productos', 'Informacion listada exitosamente',
+            $request->ip());
+
         return ProductResource::collection($categories);
     }
 
@@ -51,6 +66,12 @@ class ProductController extends Controller
         $product->product_perishable = $request->input('perishable');
         $product->category_id = $request->category_id;
         $product->save();
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha registrado un nuevo producto ' . $product->product_name,
+            'Informacion registrada exitosamente',
+            $request->ip());
+
         return response(new ProductResource($product), Response::HTTP_CREATED);
     }
 
@@ -66,10 +87,16 @@ class ProductController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         Gate::authorize('action', 'users');
         $product = Product::find($id);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha listado la informacion de un producto ' . $product->product_name,
+            'Informacion listada exitosamente',
+            $request->ip());
+
         return new ProductResource($product);
     }
 
@@ -92,6 +119,12 @@ class ProductController extends Controller
         $product->product_perishable = $request->input('perishable');
         $product->category_id = $request->category_id;
         $product->update();
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha actualizado el producto ' . $product->product_name,
+            'Informacion actualizada exitosamente',
+            $request->ip());
+
         return response(new ProductResource($product), Response::HTTP_ACCEPTED);
     }
 
@@ -117,10 +150,16 @@ class ProductController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         Gate::authorize('action', 'users');
         $product = Product::find($id);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha elimnado el producto ' . $product->product_name,
+            'Informacion eliminada exitosamente',
+            $request->ip());
+
         Storage::disk('product')->delete($product->product_image);
         $product->delete();
         return response(null, Response::HTTP_NO_CONTENT);

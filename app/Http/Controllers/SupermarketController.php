@@ -2,28 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
 use App\Http\Requests\SupermarketStoreRequest;
 use App\Http\Requests\SupermarketUpdateImageRequest;
 use App\Http\Resources\SupermarketResource;
 use App\Supermarket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
-use function Symfony\Component\String\s;
 
 class SupermarketController extends Controller
 {
+    public $appLog;
+
+    function __construct()
+    {
+        $this->appLog = new AppHelper();
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('action', 'users');
         $supermarkets = Supermarket::paginate();
+        $this->appLog->setLogs(Auth::id(), Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha listado los supermercados', 'Informacion listada exitosamente', $request->ip());
         return SupermarketResource::collection($supermarkets);
     }
 
@@ -48,6 +57,11 @@ class SupermarketController extends Controller
             'supermarket_logo' => $logo_name,
             'supermarket_status' => 1,
         ]);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha registrado el super mercado ' . $supermarket->supermarket_name,
+            'Informacion registrada exitosamente', $request->ip());
+
         return response(new SupermarketResource($supermarket), Response::HTTP_CREATED);
     }
 
@@ -57,10 +71,15 @@ class SupermarketController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         Gate::authorize('action', 'users');
         $supermarket = Supermarket::find($id);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha visto la informacion del supermercado ' . $supermarket->supermarket_name,
+            'Informacion listada exitosamente', $request->ip());
+
         return new SupermarketResource($supermarket);
     }
 
@@ -79,6 +98,11 @@ class SupermarketController extends Controller
             'supermarket_name' => $request->input('name'),
             'supermarket_status' => $request->input('status'),
         ]);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha actualizado el super mercado ' . $supermarket->supermarket_name,
+            'Informacion actualizada exitosamente', $request->ip());
+
         return response(new SupermarketResource($supermarket), Response::HTTP_ACCEPTED);
     }
 
@@ -105,10 +129,15 @@ class SupermarketController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         Gate::authorize('action', 'users');
         $supermarket = Supermarket::find($id);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha eliminado el super mercado ' . $supermarket->supermarket_name,
+            'Informacion eliminada exitosamente', $request->ip());
+
         Storage::disk('logo')->delete($supermarket->supermarket_logo);
         $supermarket->delete();
         return response(null, Response::HTTP_NO_CONTENT);

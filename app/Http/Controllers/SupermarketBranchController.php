@@ -2,26 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
 use App\Http\Requests\SupermarketBranchStore;
 use App\Http\Requests\SupermarketBranchUpdateRequest;
 use App\Http\Resources\SupermarketBranchResource;
 use App\SupermarketBranch;
 use App\SupermarketBranchBridge;
 use Carbon\Carbon;
+use http\Env\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class SupermarketBranchController extends Controller
 {
+
+    public $appLog;
+
+    function __construct()
+    {
+        $this->appLog = new AppHelper();
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('action', 'users');
         $branchs = SupermarketBranch::paginate();
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha listado las sucursales', 'Informacion listada exitosamente',
+            $request->ip());
         return SupermarketBranchResource::collection($branchs);
     }
 
@@ -49,6 +63,11 @@ class SupermarketBranchController extends Controller
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha registrado una nueva sucursal ' . $branch->supermarket_branch_name,
+            'Informacion registrada exitosamente', $request->ip());
+
         return response(new SupermarketBranchResource($branch), Response::HTTP_CREATED);
     }
 
@@ -58,10 +77,14 @@ class SupermarketBranchController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         Gate::authorize('action', 'users');
         $branch = SupermarketBranch::find($id);
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha visto la informacion de la sucursal ' . $branch->supermarket_branch_name,
+            'Informacion listada exitosamente', $request->ip());
+
         return new SupermarketBranchResource($branch);
     }
 
@@ -91,6 +114,11 @@ class SupermarketBranchController extends Controller
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha actualizado la informacion de la sucursal ' . $branch->supermarket_branch_name,
+            'Informacion actualizada exitosamente', $request->ip());
+
         return response(new SupermarketBranchResource($branch), Response::HTTP_ACCEPTED);
     }
 
@@ -100,10 +128,15 @@ class SupermarketBranchController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         Gate::authorize('action', 'users');
         $branch = SupermarketBranch::find($id);
+
+        $this->appLog->setLogs(Auth::id(),
+            Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha eliminado la informacion de la sucursal ' . $branch->supermarket_branch_name,
+            'Informacion eliminada exitosamente', $request->ip());
+
         SupermarketBranchBridge::where('supermarket_branch_id', $branch->id)->delete();
         $branch->delete();
         return response(null, Response::HTTP_NO_CONTENT);
