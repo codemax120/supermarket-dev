@@ -9,8 +9,10 @@ use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\User;
-use http\Env\Request;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,6 +48,13 @@ class UserController extends Controller
     public function store(UserCreateRequest $request)
     {
         Gate::authorize('action', 'users');
+        $supermarket_id = $request->input('supermarket_id');
+        $supermarket_branch_id = $request->input('supermarket_branch_id');
+
+        if (($supermarket_id == 0 || $supermarket_id == '') && ($supermarket_branch_id == 0 || $supermarket_branch_id == '')) {
+            return response('Debe de ingresar si estara acargo de un supermercado o sucursal', Response::HTTP_CONFLICT);
+        }
+
         $user = User::create([
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
@@ -53,6 +62,28 @@ class UserController extends Controller
             'password' => Hash::make($request->input('password')),
             'role_id' => $request->input('role_id')
         ]);
+
+        if ($supermarket_id != 0) {
+            if ($user->role_id == 2) {
+                DB::table('users_supermarket')->insert([
+                    'user_id' => $user->id,
+                    'supermarket_id' => $supermarket_id,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
+        }
+
+        if ($supermarket_branch_id != 0) {
+            if ($user->role_id == 3) {
+                DB::table('users_supermarket_branch')->insert([
+                    'user_id' => $user->id,
+                    'supermarket_branch_id' => $request->input('supermarket_branch_id'),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
+        }
 
         $this->appLog->setLogs(Auth::id(),
             Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha registrado a ' . $user->first_name . ' ' . $user->last_name,
@@ -89,6 +120,7 @@ class UserController extends Controller
     public function update(UserUpdateRequest $request, $id)
     {
         Gate::authorize('action', 'users');
+
         $user = User::find($id);
         $user->update([
             'first_name' => $request->input('first_name'),
@@ -112,6 +144,10 @@ class UserController extends Controller
     {
         Gate::authorize('action', 'users');
         $user = User::find($id);
+
+        DB::table('users_supermarket')->where('user_id', $user->id)->delete();
+        DB::table('users_supermarket_branch')->where('user_id', $user->id)->delete();
+
         $this->appLog->setLogs(Auth::id(),
             Auth::user()->first_name . ' ' . Auth::user()->last_name . ' , ha eliminado el usuario  ' . $user->first_name . ' ' . $user->last_name,
             'Eliminacion realizada exitosamente', $request->ip());
