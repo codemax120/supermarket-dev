@@ -6,6 +6,7 @@ use App\Category;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends Controller
@@ -17,6 +18,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        Gate::authorize('action', 'users');
         $categories = Category::paginate();
         return CategoryResource::collection($categories);
     }
@@ -29,6 +31,7 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request)
     {
+        Gate::authorize('action', 'users');
         $category = Category::create([
             'category_name' => $request->input('name'),
         ]);
@@ -43,6 +46,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
+        Gate::authorize('action', 'users');
         $category = Category::find($id);
         return new CategoryResource($category);
     }
@@ -56,6 +60,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
+        Gate::authorize('action', 'users');
         $category = Category::find($id);
         $category->update([
             'category_name' => $request->input('name'),
@@ -72,6 +77,7 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
+        Gate::authorize('action', 'users');
         Category::destroy($id);
         return response(null, Response::HTTP_NO_CONTENT);
     }

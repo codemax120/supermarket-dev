@@ -6,6 +6,7 @@ use App\Http\Requests\InventoryStoreRequest;
 use App\Http\Resources\InventoryResource;
 use App\Inventory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class InventoryController extends Controller
@@ -17,6 +18,7 @@ class InventoryController extends Controller
      */
     public function index()
     {
+        Gate::authorize('action', 'users');
         $inventary = Inventory::orderBy('id', 'DESC')->paginate();
         return InventoryResource::collection($inventary);
     }
@@ -29,6 +31,7 @@ class InventoryController extends Controller
      */
     public function store(InventoryStoreRequest $request)
     {
+        Gate::authorize('action', 'users');
         $inventory = new Inventory();
         $inventory->user_id = Auth::id();
         $inventory->product_id = $request->input('product_id');
@@ -47,6 +50,7 @@ class InventoryController extends Controller
      */
     public function show($id)
     {
+        Gate::authorize('action', 'users');
         $inventory = Inventory::find($id);
         return new InventoryResource($inventory);
     }
@@ -60,6 +64,7 @@ class InventoryController extends Controller
      */
     public function update(InventoryStoreRequest $request, $id)
     {
+        Gate::authorize('action', 'users');
         $inventory = Inventory::find($id);
         $inventory->product_id = $request->input('product_id');
         $inventory->product_count = $request->input('product_count');
@@ -75,6 +80,7 @@ class InventoryController extends Controller
      */
     public function destroy($id)
     {
+        Gate::authorize('action', 'users');
         Inventory::destroy($id);
         return response(null, Response::HTTP_NO_CONTENT);
     }

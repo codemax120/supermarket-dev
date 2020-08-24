@@ -8,6 +8,7 @@ use App\Http\Resources\SupermarketResource;
 use App\Supermarket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use function Symfony\Component\String\s;
@@ -21,6 +22,7 @@ class SupermarketController extends Controller
      */
     public function index()
     {
+        Gate::authorize('action', 'users');
         $supermarkets = Supermarket::paginate();
         return SupermarketResource::collection($supermarkets);
     }
@@ -33,6 +35,7 @@ class SupermarketController extends Controller
      */
     public function store(SupermarketStoreRequest $request)
     {
+        Gate::authorize('action', 'users');
         $logo = $request->file('logo');
         $logo_name = '';
         if ($logo) {
@@ -56,6 +59,7 @@ class SupermarketController extends Controller
      */
     public function show($id)
     {
+        Gate::authorize('action', 'users');
         $supermarket = Supermarket::find($id);
         return new SupermarketResource($supermarket);
     }
@@ -69,6 +73,7 @@ class SupermarketController extends Controller
      */
     public function update(Request $request, $id)
     {
+        Gate::authorize('action', 'users');
         $supermarket = Supermarket::find($id);
         $supermarket->update([
             'supermarket_name' => $request->input('name'),
@@ -79,6 +84,7 @@ class SupermarketController extends Controller
 
     public function logoUpdate(SupermarketUpdateImageRequest $request)
     {
+        Gate::authorize('action', 'users');
         $supermarket = Supermarket::find($request->id);
         $logo = $request->file('logo');
         $logo_name = '';
@@ -101,6 +107,7 @@ class SupermarketController extends Controller
      */
     public function destroy($id)
     {
+        Gate::authorize('action', 'users');
         $supermarket = Supermarket::find($id);
         Storage::disk('logo')->delete($supermarket->supermarket_logo);
         $supermarket->delete();

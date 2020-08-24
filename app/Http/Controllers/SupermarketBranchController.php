@@ -8,6 +8,7 @@ use App\Http\Resources\SupermarketBranchResource;
 use App\SupermarketBranch;
 use App\SupermarketBranchBridge;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class SupermarketBranchController extends Controller
@@ -19,6 +20,7 @@ class SupermarketBranchController extends Controller
      */
     public function index()
     {
+        Gate::authorize('action', 'users');
         $branchs = SupermarketBranch::paginate();
         return SupermarketBranchResource::collection($branchs);
     }
@@ -31,6 +33,7 @@ class SupermarketBranchController extends Controller
      */
     public function store(SupermarketBranchStore $request)
     {
+        Gate::authorize('action', 'users');
         // CREATE THE VALUE
         $branch = SupermarketBranch::create([
             'supermarket_branch_name' => $request->input('name'),
@@ -57,6 +60,7 @@ class SupermarketBranchController extends Controller
      */
     public function show($id)
     {
+        Gate::authorize('action', 'users');
         $branch = SupermarketBranch::find($id);
         return new SupermarketBranchResource($branch);
     }
@@ -70,6 +74,7 @@ class SupermarketBranchController extends Controller
      */
     public function update(SupermarketBranchUpdateRequest $request, $id)
     {
+        Gate::authorize('action', 'users');
         $branch = SupermarketBranch::find($id);
         $branch->update([
             'supermarket_branch_name' => $request->input('name'),
@@ -97,6 +102,7 @@ class SupermarketBranchController extends Controller
      */
     public function destroy($id)
     {
+        Gate::authorize('action', 'users');
         $branch = SupermarketBranch::find($id);
         SupermarketBranchBridge::where('supermarket_branch_id', $branch->id)->delete();
         $branch->delete();

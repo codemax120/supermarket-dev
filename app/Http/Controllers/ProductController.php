@@ -8,6 +8,7 @@ use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Product;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,6 +21,7 @@ class ProductController extends Controller
      */
     public function index()
     {
+        Gate::authorize('action', 'users');
         $categories = Product::paginate();
         return ProductResource::collection($categories);
     }
@@ -32,6 +34,7 @@ class ProductController extends Controller
      */
     public function store(ProductStoreRequest $request)
     {
+        Gate::authorize('action', 'users');
         $product_image = $request->file('image');
         $product_image_name = '';
         if ($product_image) {
@@ -65,6 +68,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
+        Gate::authorize('action', 'users');
         $product = Product::find($id);
         return new ProductResource($product);
     }
@@ -78,6 +82,7 @@ class ProductController extends Controller
      */
     public function update(ProductUpdateRequest $request, $id)
     {
+        Gate::authorize('action', 'users');
         $date = $this->formatDate($request->input('due_date'));
         $product = Product::find($id);
         $product->product_name = $request->input('name');
@@ -114,6 +119,7 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
+        Gate::authorize('action', 'users');
         $product = Product::find($id);
         Storage::disk('product')->delete($product->product_image);
         $product->delete();

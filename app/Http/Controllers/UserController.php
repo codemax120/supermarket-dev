@@ -8,13 +8,14 @@ use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\User;
-use http\Env\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -22,6 +23,7 @@ class UserController extends Controller
      */
     public function index()
     {
+        Gate::authorize('action', 'users');
         $users = User::paginate();
         return UserResource::collection($users);
     }
@@ -34,6 +36,7 @@ class UserController extends Controller
      */
     public function store(UserCreateRequest $request)
     {
+        Gate::authorize('action', 'users');
         $user = User::create([
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
@@ -52,6 +55,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
+        Gate::authorize('action', 'users');
         $user = User::find($id);
         return new UserResource($user);
     }
@@ -65,6 +69,7 @@ class UserController extends Controller
      */
     public function update(UserUpdateRequest $request, $id)
     {
+        Gate::authorize('action', 'users');
         $user = User::find($id);
         $user->update([
             'first_name' => $request->input('first_name'),
@@ -81,13 +86,19 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+        Gate::authorize('action', 'users');
         User::destroy($id);
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
     public function user()
     {
-        return new UserResource(Auth::user());
+        $user = Auth::user();
+        return (new UserResource($user))->additional([
+            'data' => [
+                'permissions' => $user->permissions()
+            ]
+        ]);
     }
 
     public function updateInfo(UpdateInfoRequest $request)

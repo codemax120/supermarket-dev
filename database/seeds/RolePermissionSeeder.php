@@ -33,6 +33,7 @@ class RolePermissionSeeder extends Seeder
             'edit_supermarket_branches',
             'delete_supermarket_branches'
         ];
+
         foreach ($permissions as $permission) {
             if (!in_array($permission->name, $noPermissionForSupermarketManager)) {
                 DB::table('role_permission')->insert([
