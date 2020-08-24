@@ -37,6 +37,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     // ROUTE RESOURCE FOR CATEGORIES
     Route::apiResource('categories', 'CategoryController');
     // ROUTE RESOURCE FOR PRODUCTS
-    
+    Route::apiResource('products', 'ProductController');
+    // ROUTE FOR UPDATE PRODUCT IMAGE
+    Route::post('products/image-update', 'ProductController@imageProductUpdate');
+
 
 });

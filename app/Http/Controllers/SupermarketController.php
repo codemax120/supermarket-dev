@@ -102,6 +102,7 @@ class SupermarketController extends Controller
     public function destroy($id)
     {
         $supermarket = Supermarket::find($id);
+        Storage::disk('logo')->delete($supermarket->supermarket_logo);
         $supermarket->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }
