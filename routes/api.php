@@ -43,5 +43,4 @@ Route::group(['middleware' => 'auth:api'], function () {
     // ROUTE RESOURCE FOR INVENTORY
     Route::apiResource('inventories', 'InventoryController');
 
-
 });
